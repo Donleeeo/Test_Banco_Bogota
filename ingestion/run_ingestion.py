@@ -83,7 +83,7 @@ def _chunks_from_reviews(path: str, source: str) -> list[ChunkRecord]:
     logger.info("Filas leidas de Excel: %s", len(rows))
     records: list[ChunkRecord] = []
     for row in rows:
-        text = f"Sede {row['branch_id']}. Comentario: {row['comment']}"
+        text = f"Usuario {row['user_id']}. Sede {row['branch_id']}. Comentario: {row['comment']}"
         chunks = chunk_text(text, chunk_size=400, overlap=60)
         for idx, chunk in enumerate(chunks, start=1):
             records.append(
