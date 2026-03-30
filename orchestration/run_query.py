@@ -3,14 +3,14 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-from orchestration.orchestrator import Orchestrator
+from orchestration.orchestrator import DEFAULT_TOP_K, Orchestrator
 from storage.qdrant_store import QdrantStore
 
 load_dotenv(dotenv_path=Path(__file__).resolve().parents[1] / ".env")
-DEFAULT_TOP_K = 4
 
 
 def main() -> None:
+    # CLI minima para pruebas rapidas sin levantar la UI.
     qdrant_host = os.getenv("QDRANT_HOST", "localhost").strip() or "localhost"
     qdrant_port = int(os.getenv("QDRANT_PORT", "6333"))
 

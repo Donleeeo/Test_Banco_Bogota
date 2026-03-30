@@ -4,10 +4,12 @@ import pandas as pd
 
 
 def _normalize_text(value: str) -> str:
+    # Limpio saltos y espacios repetidos para homogenizar los campos.
     return " ".join(value.split())
 
 
 def load_reviews(path: str | Path) -> list[dict]:
+    # Conservo solo las columnas que necesitamos para indexar reviews.
     df = pd.read_excel(path)
     rows: list[dict] = []
     for _, row in df.iterrows():

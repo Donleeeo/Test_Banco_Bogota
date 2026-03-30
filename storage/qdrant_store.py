@@ -7,6 +7,7 @@ class QdrantStore:
         self.client = QdrantClient(host=host, port=port)
 
     def ensure_collection(self, name: str, vector_size: int) -> None:
+        # Si la coleccion ya existe no la recreo para no perder datos.
         exists = self.client.collection_exists(collection_name=name)
         if exists:
             return
@@ -16,12 +17,12 @@ class QdrantStore:
         )
 
     def upsert(self, collection: str, points: list[PointStruct]) -> None:
+        # Upsert permite actualizar si el id ya existe.
         self.client.upsert(collection_name=collection, points=points)
 
     def search(self, collection: str, vector: list[float], limit: int = 5):
-        # Compatibilidad con versiones nuevas de qdrant-client (query_points)
+        # Soporte simple para clientes nuevos y antiguos de Qdrant.
         if hasattr(self.client, "query_points"):
             response = self.client.query_points(collection_name=collection, query=vector, limit=limit)
             return response.points
-        # Compatibilidad con versiones antiguas (search)
         return self.client.search(collection_name=collection, query_vector=vector, limit=limit)

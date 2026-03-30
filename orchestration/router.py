@@ -7,11 +7,6 @@ SOURCE_TO_COLLECTION = {
 }
 ALL_SOURCES = ["reviews", "products", "breb"]
 
-# Palabras clave heuristicas por dominio.
-# Se derivan del enunciado de la prueba y del contenido esperado de cada fuente:
-# - reviews: comentarios/sedes/satisfaccion
-# - products: portafolio y productos financieros
-# - breb: regulacion y documento tecnico BRE-B
 SOURCE_KEYWORDS = {
     "reviews": ["sede", "comentario", "review", "experiencia", "satisfaccion", "atencion"],
     "products": ["producto", "portafolio", "cuenta", "tarjeta", "credito", "prestamo", "ahorro"],
@@ -22,9 +17,7 @@ SOURCE_KEYWORDS = {
 class QueryRouter:
     def route(self, question: str) -> dict:
         q = question.lower()
-
-        # Si la pregunta contiene un codigo de sede (ej. BOG-CHAPINERO-01),
-        # priorizamos reviews para evitar ruido de otras colecciones.
+        # Cuando viene codigo de sede, casi siempre la respuesta vive en reviews.
         if re.search(r"\b[a-z]{3}-[a-z0-9]+-\d{2}\b", q):
             return {
                 "prioritized_sources": ["reviews"],
@@ -43,6 +36,7 @@ class QueryRouter:
         )
 
         if not prioritized_sources:
+            # Si no detecto una intencion clara, consulto todo para no sesgar de entrada.
             return {
                 "prioritized_sources": ALL_SOURCES.copy(),
             }
