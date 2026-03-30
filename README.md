@@ -6,6 +6,17 @@ Proyecto simple para consultar 3 fuentes desde un canal unico:
 2. Reviews de sedes (XLSX)
 3. Portafolio de productos (PDF)
 
+## Prerrequisito: levantar Qdrant
+
+Antes de ejecutar ingesta, query o UI, debes levantar Qdrant con Docker Compose.
+
+Desde `src` (donde esta `docker-compose.yml`):
+
+```powershell
+cd src
+docker compose up -d
+```
+
 ## Flujo
 
 1. Ingesta: leer, normalizar, chunking, embedding (`text-embedding-3-large`) y guardado en Qdrant.
@@ -74,3 +85,15 @@ Interfaz:
 - `bank_reviews_colombia`
 - `portafolio_productos_bancarios_v2_1`
 - `documento_tecnico_bre_b_febrero_2026`
+
+## Notebook funcional
+
+Se incluye un notebook funcional en:
+
+- `notebooks/Orquestador_Notebook.ipynb`
+- `notebooks/Ingesta_Notebook.ipynb`
+
+Los notebooks:
+
+1. `Orquestador_Notebook.ipynb`: consulta RAG y trazabilidad basica.
+2. `Ingesta_Notebook.ipynb`: carga `reviews`, `products`, `breb` o todo en Qdrant.
