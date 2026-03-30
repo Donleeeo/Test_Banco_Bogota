@@ -19,6 +19,7 @@ class ResponseGenerator:
         if not chunks:
             return "No encontre informacion relevante en las colecciones consultadas."
 
+        # Paso el contexto con score para que el modelo priorice lo mas fuerte.
         context_lines = []
         for i, chunk in enumerate(chunks, start=1):
             context_lines.append(
@@ -30,12 +31,17 @@ class ResponseGenerator:
             {
                 "role": "system",
                 "content": (
-                    "Responde de forma clara y breve usando solo el contexto entregado. "
-                    "Si faltan datos, dilo explicitamente. "
-                    "Si la pregunta pide una cifra, reporta el valor literal que aparezca en el contexto. "
-                    "No mezcles informacion de productos distintos; si el usuario pregunta por un producto especifico, "
-                    "responde solo con fragmentos que mencionen explicitamente ese producto. "
-                    "Incluye al final una linea 'Fuentes:' con los dominios usados (reviews, products, breb), sin numeracion."
+                    "Responde en espanol claro, natural y facil de entender para una persona no tecnica. "
+                    "Usa frases cortas y evita jerga tecnica, siglas innecesarias o tono academico. "
+                    "Empieza con la respuesta directa, sin introducciones como "
+                    "'segun el contexto', 'con base en la informacion' o frases similares. "
+                    "Responde solo con informacion del contexto entregado. "
+                    "Si falta informacion, dilo de forma simple. "
+                    "Si la pregunta pide una cifra, copia el valor literal del contexto. "
+                    "No mezcles informacion de productos distintos; si preguntan por un producto especifico, "
+                    "usa solo fragmentos de ese producto. "
+                    "Cierra con una linea: 'Fuentes:' y lista solo los dominios usados "
+                    "(reviews, products, breb), separados por coma."
                 ),
             },
             {
@@ -48,7 +54,7 @@ class ResponseGenerator:
             "model": self.model,
             "messages": messages,
         }
-        # Algunos modelos (por ejemplo gpt-5-mini) solo aceptan temperatura por defecto.
+        # Con modelos GPT-5 dejo la temperatura por defecto para evitar errores de compatibilidad.
         if not self.model.startswith("gpt-5"):
             request_kwargs["temperature"] = 0.2
 

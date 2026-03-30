@@ -4,6 +4,7 @@ from orchestration.response_generator import ResponseGenerator
 from orchestration.router import ALL_SOURCES, QueryRouter
 from storage.qdrant_store import QdrantStore
 
+DEFAULT_TOP_K = 11
 MIN_EVIDENCE_SCORE = 0.30
 
 
@@ -36,11 +37,12 @@ class Orchestrator:
         chunks.sort(key=lambda x: (x["adjusted_score"], x["score"]), reverse=True)
         return chunks
 
-    def answer(self, question: str, top_k: int = 4) -> dict:
+    def answer(self, question: str, top_k: int = DEFAULT_TOP_K) -> dict:
         route = self.router.route(question)
         prioritized_sources = route["prioritized_sources"]
         q_vector = self.embedder.embed([question])[0]
 
+        # Primero consulto solo lo que el router prioriza para bajar ruido.
         phase1_chunks = self._ask_agents(
             q_vector=q_vector,
             question=question,
@@ -56,6 +58,7 @@ class Orchestrator:
         combined_chunks = phase1_chunks
         sources_used = prioritized_sources
         if fallback_needed:
+            # Si la evidencia es floja, abro el resto de fuentes para no dejar fuera contexto util.
             expanded_sources = [source for source in ALL_SOURCES if source not in prioritized_sources]
             if expanded_sources:
                 phase2_chunks = self._ask_agents(
@@ -69,7 +72,7 @@ class Orchestrator:
                 sources_used = prioritized_sources + expanded_sources
                 fallback_triggered = True
 
-        # Salida final compacta: top_k global para reducir ruido y costo.
+        # Al modelo le envio solo top_k global para mantener respuesta enfocada.
         selected = combined_chunks[: max(top_k, 1)]
         answer = self.response_generator.generate(question=question, chunks=selected)
 

@@ -1,5 +1,33 @@
-.venv/
-__pycache__/
-.pytest_cache/
+# Entorno local
 .env
-data/processed/*.jsonl
+
+# Virtual env (si existe dentro de src)
+.venv/
+
+# Python caches
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Herramientas de test/lint
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Streamlit local
+.streamlit/secrets.toml
+
+# Archivos generados por ingestion
+data/processed/
+*.jsonl
+
+# Logs y temporales
+*.log
+tmp/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db

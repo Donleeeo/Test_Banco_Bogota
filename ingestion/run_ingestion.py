@@ -46,9 +46,9 @@ SOURCE_CONFIG = {
 
 
 def _stable_point_id(source: str, text: str, metadata: dict) -> int:
+    # Mantengo ids estables para que una reingesta actualice y no duplique puntos.
     raw = f"{source}|{text}|{metadata}".encode("utf-8")
     digest = hashlib.sha256(raw).hexdigest()
-    # Qdrant soporta int64 para ids numericos
     return int(digest[:16], 16)
 
 
@@ -65,7 +65,7 @@ def _resolve_input_path(raw_path: str) -> Path:
         if candidate.exists():
             return candidate
 
-    # Fallback para variantes de nombre como "archivo (1).pdf".
+    # Este fallback me salva cuando los archivos llegan con sufijos tipo "(1)".
     for folder in [Path("."), Path("data"), Path("src/data")]:
         if not folder.exists():
             continue
@@ -83,6 +83,7 @@ def _chunks_from_reviews(path: str, source: str) -> list[ChunkRecord]:
     logger.info("Filas leidas de Excel: %s", len(rows))
     records: list[ChunkRecord] = []
     for row in rows:
+        # Incluyo user_id en el texto para poder buscar directamente por usuario despues.
         text = f"Usuario {row['user_id']}. Sede {row['branch_id']}. Comentario: {row['comment']}"
         chunks = chunk_text(text, chunk_size=400, overlap=60)
         for idx, chunk in enumerate(chunks, start=1):
